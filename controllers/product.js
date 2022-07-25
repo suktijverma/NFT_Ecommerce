@@ -95,7 +95,7 @@ const productCtrl = {
         try{
           const { address, emailId, phoneNo} = req.body;
           const product = await Products.findById(req.params.id);
-          const days = (product.warrantyTime)*365;
+          const days = ((product.warrantyTime)/12)*365;
           var date = new Date();
           date.setDate(date.getDate() + days);
           const timest = Math.floor(date.getTime()/1000);
