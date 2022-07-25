@@ -5,10 +5,9 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    symbol: {
-        type: String,
-        required: true
-    },
+    price:{ type: String},
+    image: { type: String},
+    description: { type: String},
     serialNo: {
         type: String,
         required: true,

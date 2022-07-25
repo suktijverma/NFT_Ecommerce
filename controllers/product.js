@@ -47,12 +47,12 @@ async function ipfsClient() {
 const productCtrl = {
     createProduct: async (req, res) => {
         try{
-            const {name, symbol, warrantyTime, soulbound } = req.body;
+            const {name, price, image, description, warrantyTime, soulbound } = req.body;
             
             const contract = new web3.eth.Contract(abi);
             const options = {
               data: `0x${bytecode}`,
-              arguments: [name , symbol, soulbound]
+              arguments: [name , 'FLIPKART', soulbound]
             };
             const transaction = contract.deploy(options);
             const options2 = {
@@ -67,7 +67,7 @@ const productCtrl = {
             const contractAddress = receipt.contractAddress;
             const serialNo = uuidv4();
             const newProduct = new Products({
-                name, symbol, serialNo, warrantyTime, soulbound, contractAddress
+                name, price, image, description, serialNo, warrantyTime, soulbound, contractAddress
             })
             
             await newProduct.save();
@@ -79,6 +79,17 @@ const productCtrl = {
         }catch(err){
             return res.status(500).json({msg: err.message});
         }
+    },
+    getProducts: async (req, res) => {
+      try{
+        const products = await Products.find().sort('-createdAt');
+
+        res.json({
+          products
+        })
+      }catch(err){
+        return res.status(500).json({msg: err.message});
+      }
     },
     userbuy: async (req, res) => {
         try{
