@@ -97,8 +97,8 @@ const productCtrl = {
     },
     userbuy: async (req, res) => {
         try{
-          const { address, emailId, phoneNo} = req.body;
-          const product = await Products.findById(req.params.id);
+          const { address, emailId, phoneNo, id} = req.body;
+          const product = await Products.findById(req.body.id);
           const days = ((product.warrantyTime)/12)*365;
           var date = new Date();
           date.setDate(date.getDate() + days);
