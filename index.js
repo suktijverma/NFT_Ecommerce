@@ -29,25 +29,26 @@ const input = {
   sources: { 'Warranty.sol': { content: source } },
   settings: { outputSelection: { '*': { '*': ['*'] } } }
 };
-            
+
 const output = JSON.parse(solc.compile(JSON.stringify(input)));
 const abi = output.contracts['Warranty.sol']['Warranty'].abi;
 
 const app = express();
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-app.use('/',require('./routes/product'));
+app.use('/', require('./routes/product'));
 
-mongoose.connect("mongodb+srv://raghav:raghav2001@cluster0.msidk.mongodb.net/?retryWrites=true&w=majority", 
-{ useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
+mongoose.connect("mongodb+srv://raghav:raghav2001@cluster0.msidk.mongodb.net/?retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }).then(() => {
     console.log("Connected to Warranty database");
-}).catch(err => {
-    console.log("Error connecting to Warranty database",err.message);
-});
+  }).catch(err => {
+    console.log("Error connecting to Warranty database", err.message);
+  });
 
 const normalizePort = val => {
   var port = parseInt(val, 10);
@@ -91,43 +92,43 @@ server.listen(port, async () => {
   console.log("Server started on port 4001");
 });
 
-cron.schedule('0 1 * * *', () => {
+cron.schedule('33 23 * * *', () => {
   console.log("running a task every midnigt(1:00 am)");
-  (async function(){
+  (async function () {
     var date = new Date();
     date.setHours(0, 0, 0, 0);
-    const user = await Users.find({ExpiryDate: {$eq: date}});
-    for(var i=0;i<user.length;i++){
+    const user = await Users.find({ ExpiryDate: { $eq: date } });
+    for (var i = 0; i < user.length; i++) {
       const product = await Products.findById(user[i].product.toString());
       const to = `91${user[i].phoneNo}`;
       const text = `Your warranty for the product ${product.name} has expired and the warranty nft has been revoked.`;
       vonage.message.sendSms(from, to, text, (err, responseData) => {
         if (err) {
-            console.log(err);
+          console.log(err);
         } else {
-            if(responseData.messages[0]['status'] === "0") {
-                console.log("Message sent successfully.");
-            } else {
-                console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-            }
+          if (responseData.messages[0]['status'] === "0") {
+            console.log("Message sent successfully.");
+          } else {
+            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+          }
         }
       });
       var transporter = nodemailer.createTransport({
-      service: 'hotmail',
-      auth: {
-        user: 'flipkartwarrantytest@hotmail.com',
-        pass: 'flipkart@nft'
-      }
+        service: 'hotmail',
+        auth: {
+          user: 'flipkartwarrantytest@hotmail.com',
+          pass: 'flipkart@nft'
+        }
       });
 
       var mailOptions = {
         from: 'flipkartwarrantytest@hotmail.com',
         to: `${user[i].emailId}`,
         subject: 'Flipkart Warranty nft',
-        text: `Your warranty for the product ${product.name} has expired and the warranty nft has been revoked.`        
+        text: `Your warranty for the product ${product.name} has expired and the warranty nft has been revoked.`
       };
 
-      transporter.sendMail(mailOptions, function(error, info){
+      transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
           console.log(error);
         } else {
@@ -141,21 +142,21 @@ cron.schedule('0 1 * * *', () => {
       const nonce = await web3.eth.getTransactionCount(ACCOUNT_ADDRESS);
       const signedTx1 = await web3.eth.accounts.signTransaction(
         {
-          to: user[i].contractAddress, 
+          to: user[i].contractAddress,
           data,
           gas: 3000000,
           gasPrice: 20000000000,
-          nonce, 
+          nonce,
           chainId: 4
         },
         PRIVATE_KEY
       );
       const receipt3 = await web3.eth.sendSignedTransaction(signedTx1.rawTransaction);
       console.log(receipt3);
-      await Products.findOneAndUpdate({_id: user[i].product.toString()},{
-        $pull: {users: user[i]._id.toString()}
-      },{new: true});
-      await Users.findOneAndDelete({_id: user[i]._id.toString()});
+      await Products.findOneAndUpdate({ _id: user[i].product.toString() }, {
+        $pull: { users: user[i]._id.toString() }
+      }, { new: true });
+      await Users.findOneAndDelete({ _id: user[i]._id.toString() });
     }
-})();
+  })();
 })

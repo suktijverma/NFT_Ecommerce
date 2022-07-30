@@ -161,7 +161,7 @@ const productCtrl = {
           },{new: true});
 
           const to = `91${phoneNo}`;
-          const text = `Your warranty NFT is ready for the product ${product.name}. Please visit opensea website and connect your wallet with the same address that you gave at the time of buying and you will your nft there.`;
+          const text = `Your purchase for ${product.name} was successful. You have been issued a digital warranty for ${product.warrantyTime} Months. Visit https://testnets.opensea.io/account to view your issued NFT Warranty.`;
           vonage.message.sendSms(from, to, text, (err, responseData) => {
           if (err) {
             console.log(err);
@@ -185,7 +185,7 @@ const productCtrl = {
             from: 'flipkartwarrantytest@hotmail.com',
             to: `${emailId}`,
             subject: 'Flipkart Warranty nft',
-            text: `Your warranty NFT is ready for the product ${product.name}. Please visit opensea website and connect your wallet with the same address that you gave at the time of buying and you will your nft there.`        
+            text: `Your purchase for ${product.name} was successful. You have been issued a digital warranty for ${product.warrantyTime} Months. Visit https://testnets.opensea.io/account to view your issued NFT Warranty.`        
           };
 
           transporter.sendMail(mailOptions, function(error, info){

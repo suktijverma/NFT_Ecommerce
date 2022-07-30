@@ -6,18 +6,32 @@ import p1 from './images/product1.png';
 import rating from './images/rating.png';
 import { db } from "./firebase";
 import { collection, getDocs, addDoc, getDoc, orderBy, query, where} from "firebase/firestore";
-import { getAuth } from 'firebase/auth';
 import axios from 'axios';
 import productReducer from "./productReducer";
 import { SET_PRODUCT_DETAILS } from "./constants";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, onAuthStateChanged, getAuth } from 'firebase/auth';
+
 
 const Products = () => {
+
+    var user_email = null
+    const authh = getAuth();
+    onAuthStateChanged(authh, (user) => {
+        if (user) {
+            user_email = user.email;
+        } else {
+        }
+    });
+
+    
+
     const history = useNavigate();
     const [products, setProducts] = useState([]);
     const [pro, setPro] = useState([]);
     const usersCollectionRef = collection(db, "users");
     const productsCollectionRef = collection(db, "products");
+    const purchaseCollectionRef = collection(db, "orders");
     const q = query(productsCollectionRef, orderBy("timestamp", "desc"));
 
     useEffect(() => {
@@ -33,9 +47,11 @@ const Products = () => {
     }, []);
 
     const handleClick = async (id, product) => {
+        
         const authh = getAuth();
         productReducer.dispatch({type:SET_PRODUCT_DETAILS, payload:{...product}})
         const User = await getDocs(query(usersCollectionRef, where("f_email", "==", authh.currentUser.email)));
+
         User.forEach(async (doc) => {
             const res = await axios.post('http://localhost:4001/buy',{
                 id,
@@ -45,6 +61,7 @@ const Products = () => {
             });
             console.log(res);
         });
+        await addDoc(purchaseCollectionRef, {user: user_email ,name: product.f_name, price: product.f_price, transfer: product.f_transfer, time: product.f_time})
         history('/buy-now');
     }
     return (
@@ -60,7 +77,7 @@ const Products = () => {
                     const prod = pro[index]
                     return (
                         <Card style={{ width: '18rem', textAlign:"center", marginRight: "40px", marginTop: "20px " }} key={product.f_name}>
-                            <Card.Img variant="top" src={p1} style={{ width: "260px" }} />
+                            <Card.Img variant="top" src={p1} style={{ width: "260px", marginTop: "10px" }} />
                             <Card.Body >
                                 <Card.Title>{product.f_name}</Card.Title>
                                 <Card.Text >
