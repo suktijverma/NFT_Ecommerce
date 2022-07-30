@@ -7,8 +7,8 @@ const Web3 = require('web3');
 const Vonage = require('@vonage/server-sdk');
 const nodemailer = require('nodemailer');
 const vonage = new Vonage({
-  apiKey: 'd1a71064',
-  apiSecret: 'ummlrwteam40uIzP'
+  apiKey: '7ce08d68',
+  apiSecret: 'QYJzBPp8DxKMTz7N'
 });
 const from = "Vonage APIs";
 
